@@ -1,0 +1,17 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/christiandrey/playground.git",
+  "author": "Oluwaseun Adedire <oluwaseun.adedire@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently 'node-sass --watch --recursive ./ --output ./' 'tsc -w'"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.1",
+    "node-sass": "^4.13.0",
+    "typescript": "^3.7.3"
+  },
+  "dependencies": {}
+}
