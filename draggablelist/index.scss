@@ -21,9 +21,18 @@
 	align-items: center;
 }
 
+.drag-handle {
+	width: 15px;
+	height: 15px;
+	border-radius: 7.5px;
+	background-color: #0041ff;
+	margin-right: 10px;
+	cursor: grab;
+}
+
 .drag-placeholder {
 	width: 40vw;
-	height: 3px;
+	height: 2px;
 	background-color: #0041ff;
 }
 

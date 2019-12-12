@@ -2,26 +2,40 @@ type DragBounds = {
 	index: number;
 	topBoundary: number;
 	bottomBoundary: number;
+	operation: "insert" | "append";
 };
 
 let checklist = document.querySelector(".checklist");
 let dragBounds = new Array<DragBounds>();
 let dragBound: DragBounds;
+let dragTarget: EventTarget;
 
 const initializeEventListeners = () => {
+	checklist.addEventListener("mousedown", onMouseDown);
 	checklist.addEventListener("dragstart", onDragStart);
 	checklist.addEventListener("drag", onDrag);
 	checklist.addEventListener("dragend", onDragEnd);
 	checklist.addEventListener("dragover", onDragOver);
 };
 
+const onMouseDown = (e: DragEvent) => {
+	dragTarget = e.target;
+};
+
 const onDragStart = (e: DragEvent) => {
 	e.stopPropagation();
-	const scopedDragBounds = getDragBounds();
-	console.log({ scopedDragBounds });
 
-	dragBounds = scopedDragBounds;
-	dragBound = undefined;
+	const element = e.target as Element;
+	const dragHandle = element.querySelector(".drag-handle");
+
+	if (dragHandle.contains(dragTarget as any)) {
+		const scopedDragBounds = getDragBounds();
+		dragBounds = scopedDragBounds;
+		dragBound = undefined;
+		dragTarget = undefined;
+	} else {
+		e.preventDefault();
+	}
 };
 
 const onDrag = (e: DragEvent) => {
@@ -32,12 +46,12 @@ const onDrag = (e: DragEvent) => {
 		if (!!dragBound) {
 			if (scopedDragBound.index !== dragBound.index) {
 				removeDragPlaceholder();
-				createDragPlaceholder(scopedDragBound.index);
+				createDragPlaceholder(scopedDragBound);
 				dragBound = scopedDragBound;
 			}
 		} else {
 			removeDragPlaceholder();
-			createDragPlaceholder(scopedDragBound.index);
+			createDragPlaceholder(scopedDragBound);
 			dragBound = scopedDragBound;
 		}
 	}
@@ -48,7 +62,8 @@ const onDragEnd = (e: DragEvent) => {
 	removeDragPlaceholder();
 
 	if (!!dragBound) {
-		moveChecklistItem(e.target, dragBound.index);
+		console.log({ dragBound });
+		moveChecklistItem(e.target, dragBound);
 	}
 };
 
@@ -68,22 +83,26 @@ const getDragBounds = () => {
 		previousItemBoundingRect: DOMRect,
 		thisItem: Element,
 		thisItemBoundingRect: DOMRect,
+		lastItem: Element,
+		lastItemBoundingRect: DOMRect,
 		topBoundary: number,
 		bottomBoundary: number,
 		temporaryDragBounds = new Array<DragBounds>();
 
-	for (let i = 0; i < itemLength; i++) {
-		thisItem = checklistItems[i];
-		thisItemBoundingRect = thisItem.getBoundingClientRect();
+	for (let i = 0; i <= itemLength; i++) {
+		thisItem = i < itemLength ? checklistItems[i] : undefined;
+		thisItemBoundingRect = thisItem ? thisItem.getBoundingClientRect() : undefined;
 		previousItem = i > 0 ? checklistItems[i - 1] : undefined;
 		previousItemBoundingRect = previousItem ? previousItem.getBoundingClientRect() : undefined;
+		lastItem = checklistItems[itemLength - 1];
+		lastItemBoundingRect = lastItem.getBoundingClientRect();
 
 		if (i == 0) {
 			topBoundary = thisItemBoundingRect.top;
 			bottomBoundary = thisItemBoundingRect.top + thisItemBoundingRect.height * 0.5;
-		} else if (i === itemLength - 1) {
-			topBoundary = thisItemBoundingRect.top + thisItemBoundingRect.height * 0.5;
-			bottomBoundary = thisItemBoundingRect.top + thisItemBoundingRect.height;
+		} else if (i === itemLength) {
+			topBoundary = lastItemBoundingRect.top + lastItemBoundingRect.height * 0.5;
+			bottomBoundary = lastItemBoundingRect.top + lastItemBoundingRect.height;
 		} else {
 			topBoundary = previousItemBoundingRect.top + previousItemBoundingRect.height * 0.5;
 			bottomBoundary = thisItemBoundingRect.top + thisItemBoundingRect.height * 0.5;
@@ -93,6 +112,7 @@ const getDragBounds = () => {
 			index: i,
 			topBoundary,
 			bottomBoundary,
+			operation: i < itemLength ? "insert" : "append",
 		});
 	}
 
@@ -112,15 +132,26 @@ const removeDragPlaceholder = () => {
 	}
 };
 
-const createDragPlaceholder = (index: number) => {
+const createDragPlaceholder = (dragBound: DragBounds) => {
+	const { index, operation } = dragBound;
 	const dragPlaceholder = document.createElement("div");
 	dragPlaceholder.className = "drag-placeholder";
 
-	checklist.insertBefore(dragPlaceholder, checklist.children[index]);
+	if (operation === "insert") {
+		checklist.insertBefore(dragPlaceholder, checklist.children[index]);
+	} else {
+		checklist.appendChild(dragPlaceholder);
+	}
 };
 
-const moveChecklistItem = (element: any, index: number) => {
-	checklist.insertBefore(element, checklist.children[index]);
+const moveChecklistItem = (element: any, dragBound: DragBounds) => {
+	const { index, operation } = dragBound;
+
+	if (operation === "insert") {
+		checklist.insertBefore(element, checklist.children[index]);
+	} else {
+		checklist.appendChild(element);
+	}
 };
 
 // --------------------------------------------------------
