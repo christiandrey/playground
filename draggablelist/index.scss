@@ -9,6 +9,7 @@
 .checklist {
 	background-color: #dedede;
 	padding: 10px;
+	position: relative;
 }
 
 .checklist-item {
@@ -34,6 +35,8 @@
 	width: 40vw;
 	height: 2px;
 	background-color: #0041ff;
+	position: absolute;
+	left: 0;
 }
 
 .drag-placeholder-appear {

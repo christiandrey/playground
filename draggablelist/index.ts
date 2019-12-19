@@ -62,7 +62,6 @@ const onDragEnd = (e: DragEvent) => {
 	removeDragPlaceholder();
 
 	if (!!dragBound) {
-		console.log({ dragBound });
 		moveChecklistItem(e.target, dragBound);
 	}
 };
@@ -132,7 +131,7 @@ const removeDragPlaceholder = () => {
 	}
 };
 
-const createDragPlaceholder = (dragBound: DragBounds) => {
+const createDragPlaceholderLegacy = (dragBound: DragBounds) => {
 	const { index, operation } = dragBound;
 	const dragPlaceholder = document.createElement("div");
 	dragPlaceholder.className = "drag-placeholder";
@@ -142,6 +141,26 @@ const createDragPlaceholder = (dragBound: DragBounds) => {
 	} else {
 		checklist.appendChild(dragPlaceholder);
 	}
+};
+
+const createDragPlaceholder = (dragBound: DragBounds) => {
+	const { index, operation } = dragBound;
+	const dragPlaceholder = document.createElement("div");
+	dragPlaceholder.className = "drag-placeholder";
+
+	let top = 0;
+	let left = checklist.children[0].offsetLeft;
+
+	if (operation === "insert") {
+		top = (checklist.children[index] as HTMLElement).offsetTop - 1;
+	} else {
+		top = checklist.clientHeight;
+	}
+
+	dragPlaceholder.style.top = `${top}px`;
+	dragPlaceholder.style.left = `${left}px`;
+
+	checklist.appendChild(dragPlaceholder);
 };
 
 const moveChecklistItem = (element: any, dragBound: DragBounds) => {
