@@ -1,20 +1,29 @@
 {
-  "name": "playground",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/christiandrey/playground.git",
-  "author": "Oluwaseun Adedire <oluwaseun.adedire@gmail.com>",
-  "license": "MIT",
-  "scripts": {
-    "dev": "concurrently 'node-sass --watch --recursive ./ --output ./' 'tsc -w'"
-  },
-  "devDependencies": {
-    "@types/node": "^13.1.6",
-    "concurrently": "^5.0.1",
-    "node-sass": "^4.13.0",
-    "typescript": "^3.7.3"
-  },
-  "dependencies": {
-    "polate-js": "^1.0.2"
-  }
+	"name": "playground",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "https://github.com/christiandrey/playground.git",
+	"author": "Oluwaseun Adedire <oluwaseun.adedire@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"dev": "concurrently 'node-sass --watch --recursive ./ --output ./' 'rollup --config -w'"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.8.3",
+		"@rollup/plugin-commonjs": "^11.0.1",
+		"@rollup/plugin-node-resolve": "^7.0.0",
+		"@rollup/plugin-typescript": "^2.1.0",
+		"@types/node": "^13.1.6",
+		"concurrently": "^5.0.1",
+		"node-sass": "^4.13.0",
+		"rollup": "^1.29.0",
+		"rollup-plugin-babel": "^4.3.3",
+		"tslib": "^1.10.0",
+		"typescript": "^3.7.3"
+	},
+	"dependencies": {
+		"fast-memoize": "^2.5.1",
+		"polate-js": "^1.0.2",
+		"rematrix": "^0.4.1"
+	}
 }
