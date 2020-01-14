@@ -1,0 +1,16 @@
+.app {
+	width: 100%;
+	height: 500vh;
+	// display: flex;
+	// justify-content: center;
+	// align-items: center;
+}
+
+.object {
+	width: 200px;
+	height: 200px;
+	background-color: #0041ff;
+	position: absolute;
+	top: 50%;
+	left: 0;
+}

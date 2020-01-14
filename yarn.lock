@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@types/node@^13.1.6":
+  version "13.1.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.1.6.tgz#076028d0b0400be8105b89a0a55550c86684ffec"
+  integrity sha512-Jg1F+bmxcpENHP23sVKkNuU3uaxPnsBMW0cLjleiikFKomJQbsn0Cqk2yDvQArqzZN6ABfBkZ0To7pQ8sLdWDg==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -929,6 +934,11 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
+
+polate-js@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/polate-js/-/polate-js-1.0.2.tgz#8a8fdf65910f3688821c571e52b9960457aea8b0"
+  integrity sha512-GAidviephJNARhbVctB20UyLDpMFXlUlLsS8WCutr3tFWT/aHEDxr3VklcDExCPxIEi3iaM1Z8BQnFmIfxFRpQ==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"

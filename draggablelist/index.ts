@@ -149,7 +149,7 @@ const createDragPlaceholder = (dragBound: DragBounds) => {
 	dragPlaceholder.className = "drag-placeholder";
 
 	let top = 0;
-	let left = checklist.children[0].offsetLeft;
+	let left = (checklist.children[0] as any).offsetLeft;
 
 	if (operation === "insert") {
 		top = (checklist.children[index] as HTMLElement).offsetTop - 1;
