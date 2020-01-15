@@ -228,7 +228,7 @@ const getActionsForParallelTweening = (trigger: string, actions: Array<ScrollTwe
 	return actions.map(o => ({ ...o, trigger, delay: delay ?? o.delay }));
 };
 
-const getActionsForStaggeredTweening = (trigger: string, stagger: number, actions: Array<ScrollTweenAction>, delay = 0) => {
+const getActionsForStaggeredTweening = (trigger: string, stagger: number, actions: Array<ScrollTweenAction>, delay = 0): Array<ScrollTweenAction> => {
 	return actions.map((o, i) => ({
 		...o,
 		trigger,
@@ -236,7 +236,7 @@ const getActionsForStaggeredTweening = (trigger: string, stagger: number, action
 	}));
 };
 
-const getActionsForSequenceTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0) => {
+const getActionsForSequenceTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0): Array<ScrollTweenAction> => {
 	return actions.map((o, i, c) => ({
 		...o,
 		trigger,
@@ -244,7 +244,7 @@ const getActionsForSequenceTweening = (trigger: string, actions: Array<ScrollTwe
 	}));
 };
 
-const getActionsForChildrenOfElement = (parent: string, duration: number, props: TweenableProperties) => {
+const getActionsForChildrenOfElement = (parent: string, duration: number, props: TweenableProperties): Array<ScrollTweenAction> => {
 	const parentElement = document.querySelector(parent);
 	const children = parentElement?.children;
 	if (!children || children.length === 0) return [];
