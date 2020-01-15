@@ -26,7 +26,8 @@ type TweenableProperties = Partial<{
 
 type ScrollTweenAction = {
 	selector: string;
-	duration: number;
+	trigger?: string;
+	duration?: number;
 	delay?: number;
 	props?: TweenableProperties;
 };
@@ -96,8 +97,9 @@ class ScrollTweenInstance {
 
 	private _getStyleChangesUnOptimized = (action: ScrollTweenAction, scrollPosition: number) => {
 		const { selector, props, duration, delay } = action;
+		const trigger = action.trigger ?? selector;
 
-		const tweenState = this._getTweenState(selector, duration, delay ?? 0, scrollPosition);
+		const tweenState = this._getTweenState(trigger, duration, delay ?? 0, scrollPosition);
 		const styleChanges = {};
 		let elementTransforms = [this._transforms.get(selector)];
 
@@ -133,8 +135,8 @@ class ScrollTweenInstance {
 
 	private _getStyleChanges = memoize(this._getStyleChangesUnOptimized);
 
-	private _getTweenState = (selector: string, duration: number, delay: number, scrollPosition: number) => {
-		const elementOffsetTop = this._topOffsets.get(selector);
+	private _getTweenState = (trigger: string, duration: number, delay: number, scrollPosition: number) => {
+		const elementOffsetTop = this._topOffsets.get(trigger);
 		let lowerLimit: number, solveFor: number;
 
 		if (elementOffsetTop <= this._viewportHeight) {
@@ -194,19 +196,21 @@ class ScrollTweenInstance {
 		this._fontSizes = new Map();
 		this._topOffsets = new Map();
 
-		actions.forEach(({ selector }) => {
+		actions.forEach(({ selector, trigger }) => {
+			trigger = trigger ?? selector;
 			const element: HTMLElement = document.querySelector(selector);
+			const triggerElement: HTMLElement = document.querySelector(trigger);
 			const computedStyled = window.getComputedStyle(element);
 			const { transform, opacity, color, backgroundColor, fontSize } = computedStyled;
 			const transformMatrix = Rematrix.fromString(transform);
-			const top = getElementOffset(element).top;
+			const top = getElementOffset(triggerElement).top;
 
 			this._transforms.set(selector, transformMatrix);
 			this._opacities.set(selector, Number(opacity));
 			this._colors.set(selector, normalizeColor(color));
 			this._backgroundColors.set(selector, normalizeColor(backgroundColor));
 			this._fontSizes.set(selector, normalizeFontSize(fontSize));
-			this._topOffsets.set(selector, top);
+			this._topOffsets.set(trigger, top);
 		});
 	}
 }
@@ -219,8 +223,11 @@ const defineScrollTweenActions = (actions: Array<ScrollTweenAction>) => {
 	return new ScrollTweenInstance(actions);
 };
 
+const getActionsForParallelTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0): Array<ScrollTweenAction> => {};
+
 const ScrollTween = {
 	define: defineScrollTweenActions,
+	parallel: getActionsForParallelTweening,
 };
 
 export default ScrollTween;

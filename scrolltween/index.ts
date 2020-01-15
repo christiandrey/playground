@@ -21,7 +21,6 @@ scrollTween.destroy();
 const scrollTweenInstance = ScrollTween.define([
 	{
 		selector: ".object",
-		delay: 30,
 		duration: 30,
 		props: {
 			translateX: 300,
