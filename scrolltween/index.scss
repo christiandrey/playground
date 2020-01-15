@@ -12,7 +12,14 @@
 	background-color: #0041ff;
 	position: absolute;
 	top: 50%;
+	opacity: 0;
 	left: 0;
-	// opacity: 0;
-	// transform: translateY(12.5px);
+}
+
+.text {
+	color: #0041ff;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	font-size: 2rem;
 }

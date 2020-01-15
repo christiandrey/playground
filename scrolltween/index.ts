@@ -27,6 +27,7 @@ type TweenableProperties = Partial<{
 	opacity: number;
 	color: string;
 	backgroundColor: string;
+	fontSize: number;
 }>;
 
 type ScrollTweenAction = {
@@ -41,21 +42,34 @@ const sampleAction: ScrollTweenAction = {
 	props: {
 		translateX: 300,
 		rotate: 90,
-		opacity: 0.5,
-		backgroundColor: "rgb(255, 0, 0)",
+		opacity: 1,
+		scale: 0.5,
+		backgroundColor: "#8ccf53",
+	},
+};
+
+const sampleAction2: ScrollTweenAction = {
+	selector: ".text",
+	duration: 30,
+	props: {
+		translateX: 300,
+		opacity: 1,
+		color: "#8ccf53",
+		fontSize: 100,
 	},
 };
 
 const VIEWPORT_HEIGHT = window.innerHeight ?? document.documentElement.clientHeight ?? document.body.clientHeight;
 const ACTIONS = new Array<ScrollTweenAction>();
-const NON_TRANSFORM_PROPS = ["opacity", "color", "backgroundColor"];
+const NON_TRANSFORM_PROPS = ["opacity", "color", "backgroundColor", "fontSize"];
 
 const INITIAL_TRANSFORMS_DICTIONARY = new Map<string, Array<number>>();
 const INITIAL_OPACITY_DICTIONARY = new Map<string, number>();
 const INITIAL_COLOR_DICTIONARY = new Map<string, string>();
 const INITIAL_BACKGROUND_COLOR_DICTIONARY = new Map<string, string>();
+const INITIAL_FONT_SIZE_DICTIONARY = new Map<string, number>();
 
-ACTIONS.push(sampleAction);
+ACTIONS.push(sampleAction2);
 
 let scrollPosition = 0;
 let isTicking = false;
@@ -76,13 +90,14 @@ const initializeActions = () => {
 	ACTIONS.forEach(({ selector }) => {
 		const element = document.querySelector(selector);
 		const computedStyled = window.getComputedStyle(element);
-		const { transform, opacity, color, backgroundColor } = computedStyled;
+		const { transform, opacity, color, backgroundColor, fontSize } = computedStyled;
 		const transformMatrix = Rematrix.fromString(transform);
 
 		INITIAL_TRANSFORMS_DICTIONARY.set(selector, transformMatrix);
 		INITIAL_OPACITY_DICTIONARY.set(selector, Number(opacity));
 		INITIAL_COLOR_DICTIONARY.set(selector, normalizeColor(color));
 		INITIAL_BACKGROUND_COLOR_DICTIONARY.set(selector, normalizeColor(backgroundColor));
+		INITIAL_FONT_SIZE_DICTIONARY.set(selector, normalizeFontSize(fontSize));
 	});
 };
 
@@ -96,8 +111,8 @@ const runAction = (action: ScrollTweenAction, scrollPosition: number) => {
 };
 
 const normalizeColor = (color: string) => color.replace(/\s+/g, "");
+const normalizeFontSize = (fontSize: string) => Number(fontSize.replace("px", ""));
 
-//PURE FUNCTION
 const computeStyleChanges = (action: ScrollTweenAction, scrollPosition: number) => {
 	const { selector, props, duration } = action;
 
@@ -117,12 +132,17 @@ const computeStyleChanges = (action: ScrollTweenAction, scrollPosition: number) 
 				case "backgroundColor":
 					styleChanges["backgroundColor"] = computeNonTransformProp(INITIAL_BACKGROUND_COLOR_DICTIONARY.get(selector), normalizeColor(props[prop]), tweenState);
 					break;
+				case "fontSize":
+					styleChanges["fontSize"] = computeNonTransformProp(INITIAL_FONT_SIZE_DICTIONARY.get(selector), props[prop], tweenState);
+					break;
 				default:
 					break;
 			}
 			return;
 		}
-		elementTransforms.push(Rematrix[prop](props[prop] * tweenState));
+		const propValue = props[prop];
+		const computedPropValue = prop.startsWith("scale") ? 1 + propValue * tweenState : propValue * tweenState;
+		elementTransforms.push(Rematrix[prop](computedPropValue));
 	});
 
 	styleChanges["transform"] = Rematrix.toString(elementTransforms.reduce(Rematrix.multiply));

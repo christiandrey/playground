@@ -1203,10 +1203,10 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
-polate-js@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/polate-js/-/polate-js-1.0.2.tgz#8a8fdf65910f3688821c571e52b9960457aea8b0"
-  integrity sha512-GAidviephJNARhbVctB20UyLDpMFXlUlLsS8WCutr3tFWT/aHEDxr3VklcDExCPxIEi3iaM1Z8BQnFmIfxFRpQ==
+polate-js@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/polate-js/-/polate-js-1.0.5.tgz#2cc8c50d3317e40f32ee73a2c2dc3cd537d74498"
+  integrity sha512-QrMrtIxTHeN0bKIrbZT8j8Br0x1OXtpwAulP7VinSkge6fospNzS5qbtKnL32D+Y7dgKZoN9mTMx1Zvwd8Qz3A==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
