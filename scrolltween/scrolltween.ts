@@ -1,3 +1,4 @@
+import finder from '@medv/finder';
 import memoize from 'fast-memoize';
 import interpolate from 'polate-js';
 import * as Rematrix from 'rematrix';
@@ -223,11 +224,51 @@ const defineScrollTweenActions = (actions: Array<ScrollTweenAction>) => {
 	return new ScrollTweenInstance(actions);
 };
 
-const getActionsForParallelTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0): Array<ScrollTweenAction> => {};
+const getActionsForParallelTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0): Array<ScrollTweenAction> => {
+	return actions.map(o => ({ ...o, trigger, delay: delay ?? o.delay }));
+};
+
+const getActionsForStaggeredTweening = (trigger: string, stagger: number, actions: Array<ScrollTweenAction>, delay = 0) => {
+	return actions.map((o, i) => ({
+		...o,
+		trigger,
+		delay: i * stagger,
+	}));
+};
+
+const getActionsForSequenceTweening = (trigger: string, actions: Array<ScrollTweenAction>, delay = 0) => {
+	return actions.map((o, i, c) => ({
+		...o,
+		trigger,
+		delay: (i === 0 ? 0 : c.slice(0, i).reduce((acc, cur) => acc + cur.duration, 0)) + delay,
+	}));
+};
+
+const getActionsForChildrenOfElement = (parent: string, duration: number, props: TweenableProperties) => {
+	const parentElement = document.querySelector(parent);
+	const children = parentElement?.children;
+	if (!children || children.length === 0) return [];
+	const actions = [];
+
+	Array.from(children).forEach(o => {
+		const selector = finder(o);
+		const action = {
+			selector,
+			duration,
+			props,
+		};
+		actions.push(action);
+	});
+
+	return actions;
+};
 
 const ScrollTween = {
 	define: defineScrollTweenActions,
 	parallel: getActionsForParallelTweening,
+	staggered: getActionsForStaggeredTweening,
+	sequence: getActionsForSequenceTweening,
+	fromChildren: getActionsForChildrenOfElement,
 };
 
 export default ScrollTween;

@@ -23,3 +23,32 @@
 	left: 0;
 	font-size: 2rem;
 }
+
+.parent {
+	position: absolute;
+	top: 50%;
+	left: 0;
+
+	.child {
+		width: 200px;
+		height: 200px;
+		// margin-right: 10px;
+		// display: inline-block;
+		position: absolute;
+
+		&:nth-of-type(1) {
+			background-color: red;
+			left: 0;
+		}
+
+		&:nth-of-type(2) {
+			background-color: green;
+			left: 210px;
+		}
+
+		&:nth-of-type(3) {
+			background-color: blue;
+			left: 420px;
+		}
+	}
+}

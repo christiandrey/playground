@@ -126,6 +126,13 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@medv/finder@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@medv/finder/-/finder-1.1.2.tgz#d4c1c422b7b7d13b0eb5cd1180c9f6ec63cbaa03"
+  integrity sha512-lSwZQxhfc4SEsEPQCgZ6UEewgRkKQ/el23aKCoSa2psiJt2pPoJCR3shCXK6+aGcjxLAwzDpsMic/MV9Bumf1g==
+  dependencies:
+    cssesc "^2.0.0"
+
 "@rollup/plugin-commonjs@^11.0.1":
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-11.0.1.tgz#6056a6757286901cc6c1599123e6680a78cad6c2"
@@ -453,6 +460,11 @@ cross-spawn@^3.0.0:
   dependencies:
     lru-cache "^4.0.1"
     which "^1.2.9"
+
+cssesc@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-2.0.0.tgz#3b13bd1bb1cb36e1bcb5a4dcd27f54c5dcb35703"
+  integrity sha512-MsCAG1z9lPdoO/IUMLSBWBSVxVtJ1395VGIQ+Fc2gNdkQ1hNDnQdw3YhA71WJCBW1vdwA0cAnk/DnW6bqoEUYg==
 
 currently-unhandled@^0.4.1:
   version "0.4.1"
