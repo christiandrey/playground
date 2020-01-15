@@ -33,11 +33,13 @@ type TweenableProperties = Partial<{
 type ScrollTweenAction = {
 	selector: string;
 	duration: number;
+	delay?: number;
 	props?: TweenableProperties;
 };
 
 const sampleAction: ScrollTweenAction = {
 	selector: ".object",
+	delay: 30,
 	duration: 30,
 	props: {
 		translateX: 300,
@@ -54,7 +56,7 @@ const sampleAction2: ScrollTweenAction = {
 	props: {
 		translateX: 300,
 		opacity: 1,
-		color: "#8ccf53",
+		color: "#ff0000",
 		fontSize: 100,
 	},
 };
@@ -68,8 +70,9 @@ const INITIAL_OPACITY_DICTIONARY = new Map<string, number>();
 const INITIAL_COLOR_DICTIONARY = new Map<string, string>();
 const INITIAL_BACKGROUND_COLOR_DICTIONARY = new Map<string, string>();
 const INITIAL_FONT_SIZE_DICTIONARY = new Map<string, number>();
+const INITIAL_POS_TOP_DICTIONARY = new Map<string, number>();
 
-ACTIONS.push(sampleAction2);
+ACTIONS.push(sampleAction);
 
 let scrollPosition = 0;
 let isTicking = false;
@@ -88,16 +91,18 @@ const handleScroll = () => {
 
 const initializeActions = () => {
 	ACTIONS.forEach(({ selector }) => {
-		const element = document.querySelector(selector);
+		const element: HTMLElement = document.querySelector(selector);
 		const computedStyled = window.getComputedStyle(element);
 		const { transform, opacity, color, backgroundColor, fontSize } = computedStyled;
 		const transformMatrix = Rematrix.fromString(transform);
+		const top = computeElementOffset(element).top;
 
 		INITIAL_TRANSFORMS_DICTIONARY.set(selector, transformMatrix);
 		INITIAL_OPACITY_DICTIONARY.set(selector, Number(opacity));
 		INITIAL_COLOR_DICTIONARY.set(selector, normalizeColor(color));
 		INITIAL_BACKGROUND_COLOR_DICTIONARY.set(selector, normalizeColor(backgroundColor));
 		INITIAL_FONT_SIZE_DICTIONARY.set(selector, normalizeFontSize(fontSize));
+		INITIAL_POS_TOP_DICTIONARY.set(selector, top);
 	});
 };
 
@@ -114,9 +119,9 @@ const normalizeColor = (color: string) => color.replace(/\s+/g, "");
 const normalizeFontSize = (fontSize: string) => Number(fontSize.replace("px", ""));
 
 const computeStyleChanges = (action: ScrollTweenAction, scrollPosition: number) => {
-	const { selector, props, duration } = action;
+	const { selector, props, duration, delay } = action;
 
-	const tweenState = computeTweenState(selector, duration, scrollPosition);
+	const tweenState = computeTweenState(selector, duration, delay ?? 0, scrollPosition);
 	const styleChanges = {};
 	let elementTransforms = [INITIAL_TRANSFORMS_DICTIONARY.get(selector)];
 
@@ -161,11 +166,26 @@ const computeNonTransformProp = (lowerLimit: string | number, upperLimit: string
 	});
 };
 
-const computeTweenState = (selector: string, duration: number, scrollPosition: number) => {
-	const element = document.querySelector(selector);
-	const lowerLimit = 0;
-	const upperLimit = (duration * VIEWPORT_HEIGHT) / 100;
-	const solveFor = scrollPosition;
+function computeElementOffset(element: HTMLElement) {
+	var rect = element.getBoundingClientRect(),
+		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+		scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	return { top: rect.top + scrollTop, left: rect.left + scrollLeft };
+}
+
+const computeTweenState = (selector: string, duration: number, delay: number, scrollPosition: number) => {
+	const elementOffsetTop = INITIAL_POS_TOP_DICTIONARY.get(selector);
+	let lowerLimit: number, solveFor: number;
+
+	if (elementOffsetTop <= VIEWPORT_HEIGHT) {
+		lowerLimit = 0;
+		solveFor = scrollPosition;
+	} else {
+		lowerLimit = elementOffsetTop;
+		solveFor = scrollPosition + VIEWPORT_HEIGHT;
+	}
+	lowerLimit = lowerLimit + (delay * VIEWPORT_HEIGHT) / 100;
+	const upperLimit = lowerLimit + (duration * VIEWPORT_HEIGHT) / 100;
 
 	if (solveFor <= lowerLimit) return 0;
 	if (solveFor >= upperLimit) return 1;
