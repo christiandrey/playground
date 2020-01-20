@@ -25,6 +25,7 @@
 		"@medv/finder": "^1.1.2",
 		"fast-memoize": "^2.5.1",
 		"polate-js": "^1.0.5",
-		"rematrix": "^0.4.1"
+		"rematrix": "^0.4.1",
+		"scrolltween": "^0.0.5-beta"
 	}
 }

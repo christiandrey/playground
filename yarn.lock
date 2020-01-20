@@ -1427,6 +1427,16 @@ sass-graph@^2.2.4:
     scss-tokenizer "^0.2.3"
     yargs "^7.0.0"
 
+scrolltween@^0.0.5-beta:
+  version "0.0.5-beta"
+  resolved "https://registry.yarnpkg.com/scrolltween/-/scrolltween-0.0.5-beta.tgz#a1db01aa3b3afa1513f063399cda3b00ad6cd8ce"
+  integrity sha512-cvhf4mT1pAMDzh5zx8jEHp7eV+0gSksUgCwYGsWXCu9PxL5jiIcqNDf2WSS1t0JsfIMEG07gx9ndEmNhw5JqAQ==
+  dependencies:
+    "@medv/finder" "^1.1.2"
+    fast-memoize "^2.5.1"
+    polate-js "^1.0.5"
+    rematrix "^0.4.1"
+
 scss-tokenizer@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/scss-tokenizer/-/scss-tokenizer-0.2.3.tgz#8eb06db9a9723333824d3f5530641149847ce5d1"

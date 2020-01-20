@@ -1,5 +1,4 @@
-import ScrollTween from './scrolltween';
-
+// import ScrollTween from 'scrolltween';
 /*
 //API
 new ScrollTween.Staggered([]).start();
@@ -35,30 +34,36 @@ scrollTween.destroy();
 // const children = ScrollTween.fromChildren(".parent", 20, { translateX: 300 });
 // const
 
-const scrollTweenInstance = ScrollTween.define(
-	ScrollTween.staggered(
-		".parent",
-		10,
-		ScrollTween.fromChildren(".parent", 20, {
-			translateX: 300,
-			rotate: 45,
-		})
-		// 10
-	).concat([
-		{
-			selector: ".object",
-			duration: 30,
-			props: {
-				translateX: 300,
-				rotate: 90,
-				opacity: 1,
-				scale: 0.5,
-				backgroundColor: "#8ccf53",
-			},
-		},
-	])
-);
+// const scrollTweenInstance = ScrollTween.define(
+// 	ScrollTween.staggered(
+// 		".parent",
+// 		10,
+// 		ScrollTween.fromChildren(".parent", 20, [
+// 			{ translateY: 300, rotate: 45 },
+// 			{ translateY: 300, rotate: 25 },
+// 			{ translateY: 300, rotate: 75 },
+// 		])
+// 		// 10
+// 	)
+// 	//    .concat([
+// 	// 	{
+// 	// 		selector: ".object",
+// 	// 		duration: 30,
+// 	// 		props: {
+// 	// 			translateX: 300,
+// 	// 			rotate: 90,
+// 	// 			opacity: 1,
+// 	// 			scale: 0.5,
+// 	// 			backgroundColor: "#8ccf53",
+// 	// 		},
+// 	// 	},
+// 	// ])
+// );
 
-scrollTweenInstance.start();
+// scrollTweenInstance.start();
 
+// const instance = ScrollTween.raw({ trigger: ".parent", duration: 20 }, value => console.log({ value }));
+// console.log({ instance });
+// setTimeout(() => instance.refresh(), 10000);
+// scrollTweenRawInstance.start();
 // scrollTweenInstance.start();

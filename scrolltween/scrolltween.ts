@@ -1,4 +1,3 @@
-import finder from '@medv/finder';
 import memoize from 'fast-memoize';
 import interpolate from 'polate-js';
 import * as Rematrix from 'rematrix';
@@ -40,6 +39,8 @@ type ScrollTweenAction = {
 const getViewportHeight = () => {
 	return window.innerHeight ?? document.documentElement.clientHeight ?? document.body.clientHeight;
 };
+
+const generateSelector = (parentSelector: string, index: number) => `${parentSelector}>:nth-child(${index + 1})`;
 
 const getElementOffset = (element: HTMLElement) => {
 	var rect = element.getBoundingClientRect(),
@@ -177,6 +178,16 @@ class ScrollTweenInstance {
 		window.addEventListener("scroll", this._onScroll);
 	}
 
+	refresh() {
+		this._actions.forEach(({ selector, trigger }) => {
+			trigger = trigger ?? selector;
+			const triggerElement: HTMLElement = document.querySelector(trigger);
+			const top = getElementOffset(triggerElement).top;
+			this._topOffsets.set(trigger, top);
+		});
+		this._tick();
+	}
+
 	destroy() {
 		window.removeEventListener("scroll", this._onScroll);
 	}
@@ -201,8 +212,8 @@ class ScrollTweenInstance {
 			trigger = trigger ?? selector;
 			const element: HTMLElement = document.querySelector(selector);
 			const triggerElement: HTMLElement = document.querySelector(trigger);
-			const computedStyled = window.getComputedStyle(element);
-			const { transform, opacity, color, backgroundColor, fontSize } = computedStyled;
+			const computedStyle = window.getComputedStyle(element);
+			const { transform, opacity, color, backgroundColor, fontSize } = computedStyle;
 			const transformMatrix = Rematrix.fromString(transform);
 			const top = getElementOffset(triggerElement).top;
 
@@ -213,6 +224,100 @@ class ScrollTweenInstance {
 			this._fontSizes.set(selector, normalizeFontSize(fontSize));
 			this._topOffsets.set(trigger, top);
 		});
+	}
+}
+
+class ScrollTweenRawInstance {
+	private _scrollPosition: number;
+	private _isTicking: boolean;
+	private _viewportHeight: number;
+	private _callback: (value: number) => void;
+	private _elementOffsetTop: number;
+	private _config: Partial<ScrollTweenAction>;
+	private _tweenState: number;
+
+	private _onScroll = () => {
+		this._scrollPosition = window.scrollY;
+
+		if (!this._isTicking) {
+			window.requestAnimationFrame(() => {
+				this._tick();
+				this._isTicking = false;
+			});
+			this._isTicking = true;
+		}
+	};
+
+	private _tick = () => {
+		const { duration, delay } = this._config;
+		const tweenState = this._getTweenState(duration, delay, this._scrollPosition);
+
+		if (tweenState !== this._tweenState) {
+			this._callback(tweenState);
+			this._tweenState = tweenState;
+		}
+	};
+
+	private _getTweenStateUnoptimized = (duration: number, delay: number, scrollPosition: number) => {
+		const elementOffsetTop = this._elementOffsetTop;
+		let lowerLimit: number, solveFor: number;
+
+		if (elementOffsetTop <= this._viewportHeight) {
+			lowerLimit = 0;
+			solveFor = scrollPosition;
+		} else {
+			lowerLimit = elementOffsetTop;
+			solveFor = scrollPosition + this._viewportHeight;
+		}
+		lowerLimit = lowerLimit + (delay * this._viewportHeight) / 100;
+		const upperLimit = lowerLimit + (duration * this._viewportHeight) / 100;
+
+		if (solveFor <= lowerLimit) return 0;
+		if (solveFor >= upperLimit) return 1;
+
+		return Number(
+			interpolate(solveFor, {
+				inputRange: [lowerLimit, upperLimit],
+				outputRange: [0, 1],
+				extrapolate: "clamp",
+			})
+		);
+	};
+
+	private _getTweenState = memoize(this._getTweenStateUnoptimized);
+
+	start() {
+		window.addEventListener("scroll", this._onScroll);
+	}
+
+	refresh() {
+		const { trigger } = this._config;
+		const element: HTMLElement = document.querySelector(trigger);
+		const top = getElementOffset(element).top;
+
+		this._elementOffsetTop = top;
+		this._tick();
+	}
+
+	destroy() {
+		window.removeEventListener("scroll", this._onScroll);
+	}
+
+	/**
+	 *
+	 */
+	constructor(action: Partial<ScrollTweenAction>, callback: (value: number) => void) {
+		const { trigger, duration, delay } = action;
+		this._scrollPosition = 0;
+		this._isTicking = false;
+		this._viewportHeight = getViewportHeight();
+		this._callback = callback;
+
+		const element: HTMLElement = document.querySelector(trigger);
+		const top = getElementOffset(element).top;
+
+		this._elementOffsetTop = top;
+		this._config = { trigger, duration, delay: delay ?? 0 };
 	}
 }
 
@@ -244,23 +349,33 @@ const getActionsForSequenceTweening = (trigger: string, actions: Array<ScrollTwe
 	}));
 };
 
-const getActionsForChildrenOfElement = (parent: string, duration: number, props: TweenableProperties): Array<ScrollTweenAction> => {
+const getActionsForChildrenOfElement = (parent: string, duration: number, props: TweenableProperties | Array<TweenableProperties>): Array<ScrollTweenAction> => {
 	const parentElement = document.querySelector(parent);
 	const children = parentElement?.children;
-	if (!children || children.length === 0) return [];
+
+	if (!children || children.length === 0 || !props) return [];
+
+	const useGroupProps = Array.isArray(props);
 	const actions = [];
 
-	Array.from(children).forEach(o => {
-		const selector = finder(o);
+	Array.from(children).forEach((o, i) => {
+		const selector = generateSelector(parent, i);
 		const action = {
 			selector,
 			duration,
-			props,
+			props: useGroupProps ? props[i] ?? {} : props,
 		};
 		actions.push(action);
 	});
 
 	return actions;
+};
+
+const getRawTweenValues = (action: Partial<ScrollTweenAction>, callback: (value: number) => void): ScrollTweenRawInstance => {
+	const scrollTweenRawInstance = new ScrollTweenRawInstance(action, callback);
+	scrollTweenRawInstance.start();
+
+	return scrollTweenRawInstance;
 };
 
 const ScrollTween = {
@@ -269,6 +384,7 @@ const ScrollTween = {
 	staggered: getActionsForStaggeredTweening,
 	sequence: getActionsForSequenceTweening,
 	fromChildren: getActionsForChildrenOfElement,
+	raw: getRawTweenValues,
 };
 
 export default ScrollTween;
