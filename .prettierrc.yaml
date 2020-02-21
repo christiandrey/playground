@@ -3,3 +3,4 @@ printWidth: 170
 tabWidth: 2
 useTabs: true
 jsxBracketSameLine: true
+singleQuote: true
